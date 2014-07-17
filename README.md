@@ -2,7 +2,7 @@ Data Analysis
 ========================================================
 This Repo contains Data Analysis project.
 
-<li>
-<ol>Job satisfaction vs Educaiton level</ol>
-</li>
+<ol>
+<li>Job satisfaction vs Educaiton level</li>
+</ol>
 

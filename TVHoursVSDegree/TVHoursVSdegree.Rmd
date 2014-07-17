@@ -1,0 +1,105 @@
+### Does hours spent on TV varies with Education level?
+
+### Introduction:
+    In this study we will explore relationship between the education level and no of hours spent on TV. It is an important variable to study, since will help us in targetting the correct audience while producing a TV show and TV commercials.
+
+### Data:
+
+```{r}
+  load("/Users/ashokjain/Desktop/R/statistics-project-gss.RData")
+```
+    The data used in this project is obtained from General social survey(GSS). GSS has been conducting surveys from 1972-2012 to monitor the American societal change and to capture the trend changes that happen over the years. Survey consists of specific set of questions that has been repeated over the years.
+      The survey has been conducted by computer-assisted personal interview (CAPI), face-to-face interview, telephone interview and the respondents for this survey are randomly selected. Since we are merely observing the responses and monitor them over years, it is an observational study. Hence the result of this study is generalizable to US population. 
+      Two main variables we will be studying is tvhours and degree. tvhours is a numerical variable and it captures the number of hours spent by the respondent, degree is a categorical variable and it has 5 levels.
+      
+    summary of the variables
+```{r fig.width=7, fig.height=6}
+  attach(gss)
+  summary(tvhours)
+  summary(degree)
+```
+    Before we start with the data analysis we will create a data frame with only two variables tvhours and degree.
+
+```{r echo =TRUE}
+    degtv<-data.frame(degree,tvhours)
+    head(degtv)
+    summary(degtv)
+```
+    from the summary, we notice that there are null values in the data frame.
+```{r}
+  gdata<-na.omit(degtv)
+  head(gdata)
+```
+    Now that we have removed all the null values we will summarise the data once again.
+```{r}
+  summary(gdata)  
+```
+    visualizing the two variables.
+```{r}
+plot(gdata$degree, xlab = "Degree", ylab = "Counts", main = "Degree")
+
+hist(gdata$tvhours,breaks = 24, col = "blue", main = "Tv hours Distribution")
+summary(gdata)
+```
+
+    To compare different groups in degree variable we are using Box plot.
+```{r}
+boxplot(gdata$tvhours~gdata$degree, ylab='TV Hours',xlab='Degree')
+```
+    Here we observe that LtHigh School has more variability, which means that respondents watch more hours of TV compared to any other group. It is right skewed i.e mean is greater than the median. 
+
+    we can observe the same numerically using 'by' function in R.
+```{r}
+ by(gdata$tvhours,gdata$degree,summary)
+```  
+### Inference:
+    Before we go further with our analysis, we set null and alternate hypothesis. 
+    H_0 -  all groups watch same amount(hours) of TV
+    H_A -  TV watching Hours differs between groups.
+    
+    since one variable is categorical with 5 levels and other group is numerical we will employ anova function to test our hypothesis.
+    
+    we will check the condition for anova, 
+    1) sampled observations within group are independent.
+    2) groups are independent of each other.
+    3) distributions with in each group are nearly normal.
+    4) each group has roughly equal variability as you can see in the box plot.
+  
+    since all the condition for anova has been met we will use aov function now.
+```{r}
+  fit<-aov(gdata$tvhours~gdata$degree,data = gdata)
+  anova(fit) 
+```
+    from the result we reject null hypothesis and conclude that all group means are not equal.
+ 
+    now to check which group means are significantly different from each other we use Tukey test
+```{r}
+  TukeyHSD(fit)
+```
+    from the result we observe that all the group differ significantly from each other. Tukey test also gives the 95% confident interval difference between any two group.
+    we will interpret one result from Tukey output.
+    The High school group watches tv .81 to .64 hours less to the group Left High School. The p value is less than 5 % significance level and there is siginifant differnce between these two groups.
+```{r}
+  plot(TukeyHSD(fit))
+```
+    we can observe mean and confidence interval for each group from the plot.
+    
+### Conclusion:
+    With the conclusion of this research we can say that Tv watching hours differs significantly among the groups. The more a group is educated lesser they watch TV and vice versa. Since it is an observational studies and observations are randomly sampled, we can generalize this findings to the population of USA.
+
+### References:
+    Data Citation:                                                                                                       Smith, Tom W., Michael Hout, and Peter V. Marsden. General Social Survey, 1972-2012 [Cumulative File]. ICPSR34802-v1. Storrs, CT: Roper Center for Public Opinion Research, University of Connecticut /Ann Arbor, MI: Inter-university Consortium for Political and Social Research [distributors], 2013-09-11. doi:10.3886/ICPSR34802.v1 
+    
+    Links:
+
+    Research Home page - http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/34802/version/1
+    
+    Variable Description - https://d396qusza40orc.cloudfront.net/statistics%2Fproject%2Fgss1.html
+
+    Data - http://bit.ly/dasi_gss_data
+### Appendix:
+```{r echo = TRUE}
+    gdata[1:50,]
+```
+
+  

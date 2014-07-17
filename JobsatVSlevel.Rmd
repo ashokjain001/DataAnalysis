@@ -1,0 +1,134 @@
+
+### Job Satisfaction and Level of Education.
+
+```{r echo=FALSE}
+   load("/Users/ashokjain/Desktop/R/statistics-project-gss.RData")
+```
+<!-- In the remainder of the document, add R code chunks as needed -->
+### Introduction:
+      Are people with advanced degree more satisfied with their job. This is an important question, as it helps one to decide whether to go for that expensive college Degree or not.Is the time, money, effort spent in earning advanced degree pays off in getting a job with higher satisfaction.Job satisfaction sometimes acts as a motivation factor for the student to go for advanced degree, hence it is important to study the relation between the two variable.
+      This research will help potential students to make that crucial decision.
+
+### Data:
+
+      The data used in this project is obtained from General social survey(GSS). GSS has been conducting surveys from 1972-2012 to monitor the American societal change and to capture the trend changes that happen over the years. Survey consists of specific set of questions that has been repeated over the years.
+      The survey has been conducted by computer-assisted personal interview (CAPI), face-to-face interview, telephone interview and the respondents for this survey are randomly selected. Since we are merely observing the responses and monitor them over years, it is an observational study. Hence the result of this study is generalizable to US population. 
+      The two categorical variable which are used in this study are satjob(response variable) and degree(explanatory variable). We cannot deduce any causal relationship between these two variables because we are not doing any random assignment and hence correlation between the two variable might due to some third confounding variable which is not recorded.  
+      The data set has 57061 records and 114 variables.
+```{r echo=TRUE}
+  dim(gss)
+```
+    
+### Exploratory data analysis:
+
+    To begin with we will first summarize the two variable. 
+
+    degree - It captures the level of education of each respondent and it has 5 levels.
+```{r echo=TRUE}
+    attach(gss)
+    summary(degree)
+```
+    satjob - Tells us about the job satisfaction and it has 4 levels.
+```{r echo=TRUE}
+    summary(satjob)
+```
+    from the summary of these two variable we can see that there are missing values.First, we will convert these two variable in to data frame and then remove those missing values.
+```{r echo=TRUE}
+    data<-data.frame(degree,satjob)
+    head(data)
+    gooddata<-na.omit(data)
+    head(gooddata)
+    tail(gooddata)
+```
+
+    we can see that the missing values has been removed from the dataframe. 
+    using the summary function to compare the data with NA and without NA's
+```{r echo=TRUE}
+    summary(data)
+    nrow(data)
+    summary(gooddata)
+    nrow(gooddata)
+```
+
+    Now we will be creating frequency table, to explore each level of both the variables.
+```{r echo=TRUE}
+frequency<-table(gooddata$degree,gooddata$satjob)
+frequency   
+```
+
+    Distribution of the variables using plots.
+    Degree
+```{r echo=TRUE}
+    attach(gooddata)
+    plot(gooddata$degree,xlab = "Degree", ylab = "Observations", main = "Degree")
+```
+    satjob
+```{r echo=TRUE}
+    plot(gooddata$satjob,xlab = "satjob", ylab = "Observations", main = "Job satisfaction")
+```
+    frequency plot of degree and satjob
+```{r echo=TRUE}
+    barplot(frequency, xlab = "Degree",ylab = "Observations",beside = TRUE, main = "",col=c("blue","red","green","yellow","black"),legend = rownames(frequency))
+    
+    plot(frequency, xlab = "Degree",ylab = "Job Satisfaction", main = "Proportion of Job satisfaction by Degree")
+```
+    Initial observation of the frequency plot suggests that those who hold some sort of college degree are more satisfied with their job than those who left High school and graduated High school.
+    The level of job Disatisfaction is also high among those who do not hold college degrees.
+
+### Inference:
+    In this section we will discuss about the relationship between the two variables Degree vs Satjob.
+    Before we go further we will set our hypothesis condition.
+
+    H_0 - Null hypothesis - Degree and satjob are independent. Job satisfation(satjob) do not vary by the degree.
+    H_A - Alternate hypothesis - Degree and satjob are dependent. Job satisfaction (satjob) do vary by the degree.
+    
+    Loading the custom inference function that is used in lab.
+```{r echo=TRUE}
+    load(url("http://s3.amazonaws.com/assets.datacamp.com/course/dasi/inference.Rdata"))    
+```
+    Inference function takes two categorical variable satjob and degree as input, we use proportion parameter to calcuate our test statistics.since we have two categorical variable with many levels, we will be using chi-square test of independence. The inference function identifies two categorical variable and runs chi-square test for us.The parameter to estimate for categorical variable is proportion.
+    
+    Before we go ahead and run the inference function, we need to check the condition for chi-square test.
+      1)sampled observations are independent of each other. 
+      2)The samples are obtained by random sampling and without replacement.
+      3)The total number of observations after removing NA are 40672 < 10% of US population.
+      4)each case contributes to one cell in the table(data frame - gooddata).
+      5)from the freqeuncy table we can observe that each particular scenario has more than 5 cases/counts
+      
+```{r echo = TRUE}
+inference(gooddata$satjob,gooddata$degree, est = "proportion", type= "ht", method = "theoretical", alternative = "greater",inf_lines = TRUE)
+```
+     Since,chisq test calculates test statistics (chisq) from the Expected and observed counts.First the observed counts(contingency table) is calculated and expected counts of each level of categorical variable is calculated.The test statistic value is very high around 267 and degree of freedom is 12. The higher test statistic means higher deviation from the null hypothesis and it provides strong evidence for alternate hypothesis. we get p-Value less than 2.2e<-16 though it is not an exact value, but small enough to reject null hypothesis.
+    Alternatively we can calculate this by using chisq function available in R.
+```{r echo = TRUE}
+    chisq.test(frequency)
+```
+    we can calculate the exact p value which is less than 2.2e<-16 using the pchisq function in R.
+```{r echo = TRUE}
+    pchisq(267.1,12,lower.tail = FALSE)
+```
+    P value obtained is very low and since it is less than 5% significance level, we reject null hypothesis that there is no relationship between the satjob and degree. There is a relationship between Degree and satjob. As one obtains college or higher degree he is more satisfed with his job and less dissatisfaction with is job.
+    From the chisquare graph we can observe the p value. The tail area above the calculated test statistic value of 267.137, it is very small thin dark line. 
+### Conclusion:
+    Though the findings of this study shows that there is a significance relationship between Degree attained and job satisfaction. we have to be careful on generalizing this study, Educational attainment alone does not translate to job satisfaction. It may also depends on individuals performance. whether the effort/performance they put in matches up to their expectation which results in Job satisfaction.
+    
+### References:
+    Data Citation:                                                                                                       Smith, Tom W., Michael Hout, and Peter V. Marsden. General Social Survey, 1972-2012 [Cumulative File]. ICPSR34802-v1. Storrs, CT: Roper Center for Public Opinion Research, University of Connecticut /Ann Arbor, MI: Inter-university Consortium for Political and Social Research [distributors], 2013-09-11. doi:10.3886/ICPSR34802.v1 
+    
+    Links:
+
+    Research Home page - http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/34802/version/1
+    
+    Variable Description - https://d396qusza40orc.cloudfront.net/statistics%2Fproject%2Fgss1.html
+
+    Data - http://bit.ly/dasi_gss_data
+### Appendix:
+```{r echo = TRUE}
+    data[1:50,]
+```
+
+```{r}
+
+```
+
+  
